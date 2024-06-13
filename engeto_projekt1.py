@@ -24,17 +24,23 @@ user_password = input("Insert your password: ")
 print("username:", user_name)
 print("password:", user_password)
 print("-" * 70)
+
+valid_user = False
 for user_info in registered_users: 
     if user_info["user"] == user_name and user_info["password"] == user_password:
+        valid_user = True
         print("Welcome to the app, ", user_name)
         print("We have 3 texts to be analyzed")
         break
-        if user_info != registered_users:
-            print("unregistered user, terminating the program...")
-            sys.exit() 
+#oprava podmínky pro neplatného uživatele
+if not valid_user:
+    print("unregistered user, terminating the program...")
+    sys.exit() 
 
 print("-" * 70)
-TEXTS = ['''_''', '''   
+
+#byl odstraněn znak pro úpravu indexování
+TEXTS = ['''   
 Situated about 10 miles west of Kemmerer,
 Fossil Butte is a ruggedly impressive
 topographic feature that rises sharply
@@ -61,14 +67,13 @@ other freshwater genera and herring similar to those
 in modern oceans. Other fish such as paddlefish,
 garpike and stingray are also present.'''
 ]
-# u textu jsem přidal nový string " " na index 0, aby texty odpovídaly číslicím
 
 selected_number = input("Enter a number btw. 1 and 3 to select:")
 
 if not selected_number.isnumeric():  #prvně ověřuji zda je input číslo. Mám to zvlášť, protože mi to jinak nefungovalo správně
     print("You have not input a number")
     sys.exit()
-
+#tady je to jiný
 selected_number = int(selected_number)
 if selected_number == 1 or selected_number == 2 or selected_number == 3:
     print("Enter a number btw. 1 and 3 to select:", selected_number)
@@ -77,7 +82,8 @@ else:
     sys.exit() 
 
 print("-" * 70)
-working_text = TEXTS[selected_number]
+#opravení indexování
+working_text = TEXTS[selected_number -1]
 word_count = len(working_text.split())
 word_first_upper = []
 word_upper = []
@@ -85,25 +91,17 @@ word_lower = []
 num_count = []
 num_sum = []
 
-for word_fu in working_text.split():
-    if word_fu.istitle():
+#sjednocení for cyklů
+for word in working_text.split():
+    if word.istitle():
         word_first_upper.append(1)
-
-for word_u in working_text.split():
-    if word_fu.isupper():
+    if word.isupper() and word.isalpha():
         word_upper.append(1)
-
-for word_l in working_text.split():
-    if word_l.islower():
+    if word.islower():
         word_lower.append(1)
-
-for num_c in working_text.split():
-    if num_c.isnumeric():
+    if word.isnumeric():
         num_count.append(1)
-
-for num_s in working_text.split():
-    if num_s.isnumeric():
-        num_sum.append(int(num_s))
+        num_sum.append(int(word))
 
 print("There are ",word_count," words in the selected text.")
 print("There are ",sum(word_first_upper), " titlecase words.")
@@ -117,15 +115,14 @@ print("-" * 70)
 
 word_len_count = {}
 
-for wordlc in working_text.split():
-    word_len_count[len(wordlc)] = word_len_count.get(len(wordlc), 0) + 1
+for word in working_text.split():
+    word_len_count[len(word)] = word_len_count.get(len(word), 0) + 1
 
-for length, count in word_len_count.items():
+#for length, count in word_len_count.items():
+#    print(" " * (2 - len(str(length))), length, "|", ("*" * count), " " * (16 - count), "|", count) 
+for length, count in sorted(word_len_count.items()):
+    print(f"{length:>2} | {'*' * count:<17} | {count}")
 
-    print(" " * (2 - len(str(length))), length, "|", ("*" * count), " " * (16 - count), "|", count) 
-
-#přiznávám, že na (2 - len(str(length))) jsem přišel náhodou, nedošlo mi, že length je int. 
-#Když tam ale nechám pouze 2-length, tak nejsou ty svislé čáry zarovnané.
 
 
 
