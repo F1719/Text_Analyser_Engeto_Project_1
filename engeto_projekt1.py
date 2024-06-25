@@ -25,21 +25,6 @@ print("username:", user_name)
 print("password:", user_password)
 print("-" * 70)
 
-valid_user = False
-for user_info in registered_users: 
-    if user_info["user"] == user_name and user_info["password"] == user_password:
-        valid_user = True
-        print("Welcome to the app, ", user_name)
-        print("We have 3 texts to be analyzed")
-        break
-#oprava podmínky pro neplatného uživatele
-if not valid_user:
-    print("unregistered user, terminating the program...")
-    sys.exit() 
-
-print("-" * 70)
-
-#byl odstraněn znak pro úpravu indexování
 TEXTS = ['''   
 Situated about 10 miles west of Kemmerer,
 Fossil Butte is a ruggedly impressive
@@ -68,15 +53,30 @@ in modern oceans. Other fish such as paddlefish,
 garpike and stingray are also present.'''
 ]
 
-selected_number = input("Enter a number btw. 1 and 3 to select:")
+valid_user = False
+for user_info in registered_users: 
+    if user_info["user"] == user_name and user_info["password"] == user_password:
+        valid_user = True
+        print("Welcome to the app, ", user_name)
+        print(f"We have {len(TEXTS)} texts to be analyzed")
+        break
+#oprava podmínky pro neplatného uživatele
+if not valid_user:
+    print("unregistered user, terminating the program...")
+    sys.exit() 
+
+print("-" * 70)
+
+texts_len = len(TEXTS)
+selected_number = input(f"Enter a number between 1 and {texts_len} to select:")
 
 if not selected_number.isnumeric():  #prvně ověřuji zda je input číslo. Mám to zvlášť, protože mi to jinak nefungovalo správně
     print("You have not input a number")
     sys.exit()
-#tady je to jiný
+
 selected_number = int(selected_number)
-if selected_number == 1 or selected_number == 2 or selected_number == 3:
-    print("Enter a number btw. 1 and 3 to select:", selected_number)
+if selected_number in range(1, texts_len + 1):
+    print(f"Enter a number between 1 and {texts_len} to select:", selected_number)
 else:
     print("You selected a wrong number")
     sys.exit() 
@@ -91,17 +91,20 @@ word_lower = []
 num_count = []
 num_sum = []
 
-#sjednocení for cyklů
+#odstranění nežádoucích znaků
+unwanted_characters = str.maketrans(" ", " ",".,;!?-")
+
 for word in working_text.split():
-    if word.istitle():
+    clean_word = word.translate(unwanted_characters) #očištění slov o nežádoucí znaky
+    if clean_word and clean_word[0].isalpha() and clean_word[0].isupper():#kontrola zda první index je velké písmeno
         word_first_upper.append(1)
-    if word.isupper() and word.isalpha():
+    if clean_word.isupper() and clean_word.isalpha():
         word_upper.append(1)
-    if word.islower():
+    if clean_word.islower():
         word_lower.append(1)
-    if word.isnumeric():
+    if clean_word.isnumeric():
         num_count.append(1)
-        num_sum.append(int(word))
+        num_sum.append(int(clean_word))
 
 print("There are ",word_count," words in the selected text.")
 print("There are ",sum(word_first_upper), " titlecase words.")
@@ -116,10 +119,9 @@ print("-" * 70)
 word_len_count = {}
 
 for word in working_text.split():
-    word_len_count[len(word)] = word_len_count.get(len(word), 0) + 1
-
-#for length, count in word_len_count.items():
-#    print(" " * (2 - len(str(length))), length, "|", ("*" * count), " " * (16 - count), "|", count) 
+    clean_word = word.translate(unwanted_characters)
+    word_len_count[len(clean_word)] = word_len_count.get(len(clean_word), 0) + 1
+ 
 for length, count in sorted(word_len_count.items()):
     print(f"{length:>2} | {'*' * count:<17} | {count}")
 
